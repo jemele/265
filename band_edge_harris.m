@@ -1,4 +1,4 @@
-function [positive,base] = band_edge_harris(sps,alpha,delay)
+function [left,right] = band_edge_harris(sps,alpha,delay)
 
 % band_edge_harris(sps,alpha,delay), 
 % positive freq band edge filter
@@ -19,5 +19,6 @@ m=n/2;
 % now translate center to (1+alpha)*fs/2
 phi=(1+alpha)*(-m:0.5:m)/(2*sps);
 phi=phi(2:2:length(phi));
-positive=exp(j*2*pi*phi).*base;
+right=exp(j*2*pi*phi).*base;
+left=conj(right);
 end

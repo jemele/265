@@ -61,18 +61,18 @@ ylabel('Normalized Log Magnitude (dB)');
 
 % 2b. Form the pair of band edge filters and show on a single page the impulse
 % response and frequency response of the filters.
-[right,base] = band_edge_harris(sps,alpha,delay);
-left = conj(right);
-left_frequency_response = fftshift(20*log10(abs(fft(left/sum(left),bins))));
-right_frequency_response = fftshift(20*log10(abs(fft(right/sum(right),bins))));
-base_frequency_response = fftshift(20*log10(abs(fft(base/sum(base),bins))));
+[left,right] = band_edge_harris(sps,alpha,delay);
+left_frequency_response = fftshift(20*log10(abs(fft(left,bins))));
+right_frequency_response = fftshift(20*log10(abs(fft(right,bins))));
+shape_frequency_response = fftshift(20*log10(abs(fft(shape/sum(shape),bins))));
 
 figure(2);
 hold on;
+plot((-0.5:1/bins:0.5-1/bins)*sps,left_frequency_response,'r');
+plot((-0.5:1/bins:0.5-1/bins)*sps,right_frequency_response,'r');
+plot((-0.5:1/bins:0.5-1/bins)*sps,shape_frequency_response,'b');
+axis([-2 2 -60 10]);
 grid on;
-plot((-0.5:1/bins:0.5-1/bins)*sps,left_frequency_response,'b');
-plot((-0.5:1/bins:0.5-1/bins)*sps,right_frequency_response,'b');
-plot((-0.5:1/bins:0.5-1/bins)*sps,base_frequency_response,'r');
 title(['Band Edge Filter, Frequency Response'])
 xlabel('Frequency');
 ylabel('Normalized Log Magnitude (dB)');
