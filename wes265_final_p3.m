@@ -91,3 +91,27 @@ line('XData',[+2*f(1)/fs +2*f(1)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
 line('XData',[-2*f(2)/fs -2*f(2)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
 line('XData',[+2*f(2)/fs +2*f(2)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
 
+% 3b. Show the time series and spectrum pf the derivative filter dh(n) formed
+% by convolution with [1 0 -1]/2 phase aligned with h(n) by discarding end
+% points.
+dh = conv([1 0 -1]/2,h);
+dh = dh(2:length(dh)-1);
+
+figure(2);
+subplot(2,1,1);
+hold on;
+plot(dh);
+grid on;
+title('Prototype Derivative Filter, Time Series, Real Part');
+xlabel('Time Index');
+ylabel('Amplitude');
+
+frequency_response = fftshift(20*log10(abs(fft(dh,bins))));
+subplot(2,1,2);
+hold on;
+plot(-0.5:1/bins:0.5-1/bins,frequency_response);
+grid on;
+title('Prototype Derivative Filter, Frequency Response');
+xlabel('Normalized Frequency');
+ylabel('Log Magnitude (dB)');
+
