@@ -64,17 +64,33 @@ ylabel('Normalized Log Magnitude (dB)');
 [left,right] = band_edge_harris(sps,alpha,delay);
 left_frequency_response = fftshift(20*log10(abs(fft(left,bins))));
 right_frequency_response = fftshift(20*log10(abs(fft(right,bins))));
-shape_frequency_response = fftshift(20*log10(abs(fft(shape/sum(shape),bins))));
 
 figure(2);
+subplot(2,2,1);
 hold on;
-plot((-0.5:1/bins:0.5-1/bins)*sps,left_frequency_response,'r');
-plot((-0.5:1/bins:0.5-1/bins)*sps,right_frequency_response,'r');
-plot((-0.5:1/bins:0.5-1/bins)*sps,shape_frequency_response,'b');
+plot(-delay:1/sps:delay, real(left), 'b');
+title(['Left Band Edge Filter, Impulse Response, Real Part'])
+grid on;
+xlabel('Time Index');
+ylabel('Amplitude');
+
+subplot(2,2,2);
+hold on;
+plot(-delay:1/sps:delay, real(right), 'b');
+title(['Right Band Edge Filter, Impulse Response, Real Part'])
+grid on;
+xlabel('Time Index');
+ylabel('Amplitude');
+
+subplot(2,1,2);
+hold on;
+plot((-0.5:1/bins:0.5-1/bins)*sps,left_frequency_response,'b');
+plot((-0.5:1/bins:0.5-1/bins)*sps,right_frequency_response,'b');
+plot((-0.5:1/bins:0.5-1/bins)*sps,shape_frequency_response,'r');
 axis([-2 2 -60 10]);
 grid on;
-title(['Band Edge Filter, Frequency Response'])
-xlabel('Frequency');
+title(['Band Edge and Match Filters, Frequency Response'])
+xlabel('Normalized Frequency');
 ylabel('Normalized Log Magnitude (dB)');
 
 % generate symbols

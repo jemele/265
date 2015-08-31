@@ -27,7 +27,7 @@ hold on;
 grid on;
 plot(-delay:1:delay, shape(1:sps:length(shape)), 'ro');
 plot(-delay:1/sps:delay, shape, 'b');
-title(['Shape Filter, Impulse Resonse'])
+title(['Shape Filter, Impulse Response'])
 xlabel('Time Index');
 ylabel('Normalized Amplitude');
 
