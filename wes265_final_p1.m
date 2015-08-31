@@ -170,7 +170,7 @@ ylabel('Amplitude');
 subplot(3,1,3);
 hold on;
 plot(received_data(domain_symbols),'r.');
-axis('equal');
+axis('square');
 axis([-1.5 1.5 -1.5 1.5]);
 grid on;
 title(['Constellation Diagram']);
@@ -205,9 +205,69 @@ ylabel('Amplitude');
 subplot(3,1,3);
 hold on;
 plot(matched_data(domain_symbols),'r.');
-axis('equal');
+axis('square');
 axis([-1.5 1.5 -1.5 1.5]);
 grid on;
 title(['Constellation Diagram']);
 
-% 1f.
+% 1f. Show the three learning curves for the three initial conditions.
+figure(6);
+taps = 65;
+initial_taps = [33 33-24 33+24];
+for n=1:length(initial_taps)
+
+    tap=initial_taps(n);
+    [output, err] = equalizer(sps,matched_data,taps,tap);
+
+    subplot(length(initial_taps),1,n);
+    hold on;
+    plot(20*log10(abs(err)));
+    plot(20*log10(filter(0.05,[1 -0.95], abs(err))),'r');
+    axis([0 symbol_count -60 5]);
+    grid on;
+    title(['Learning Curve (initial tap ',num2str(tap), ')']);
+    xlabel('Symbol');
+    ylabel('Error Magnitude (dB)');
+end
+
+% 1g. Show 400 samples of the time response (real part) the eye diagram and the
+% constellation of the signal formed at the equalizer filter output after
+% reaching steady state
+
+% Based on the learning curve, the equalizer is in steady state after 400 samples.
+domain_samples = [400+1:1:400+1+400];
+domain_symbols = [400+1:sps:400+1+400];
+
+figure(7);
+[output, err] = equalizer(sps,matched_data,taps,33);
+
+subplot(3,1,1);
+hold on;
+plot(domain_samples, real(output(domain_samples)));
+plot(domain_symbols, real(output(domain_symbols)),'ro');
+axis([min(domain_samples) max(domain_samples) -2 2]);
+grid on;
+title(['Equalizer Output, Real part']);
+xlabel('Sample');
+ylabel('Amplitude');
+
+subplot(3,1,2);
+plot(0,0);
+hold on;
+for n=min(domain_samples):2*sps:max(domain_samples)
+plot(-1:1/sps:1,real(output(n:n+2*sps)),'b');
+end
+hold off;
+grid on;
+title(['Eye Diagram, Equalizer Output, Real Part']);
+ylabel('Amplitude');
+
+subplot(3,1,3);
+hold on;
+plot(output(domain_symbols),'r.');
+axis('square');
+axis([-1.5 1.5 -1.5 1.5]);
+grid on;
+title(['Constellation Diagram']);
+
+
