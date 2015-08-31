@@ -3,7 +3,7 @@
  
 % clean up environment before starting
 clear all;
-%close all;
+close all;
 
 % design parameters
 alpha = 0.5
@@ -21,11 +21,12 @@ k_p = (4*eta*theta_0)/denom;
 % shape filters
 shape = rcosine(1,sps,'sqrt',alpha,delay);
 shape = shape/max(shape);
+match = conv(shape,shape)/(shape*shape');
 
 % 2a. Show the impulse response and frequency response of the shaping filter
 % and the cascade of the two filters.
 figure(1);
-subplot(2,1,1);
+subplot(2,2,1);
 hold on;
 plot(1:length(impz(shape)), shape);
 grid on;
@@ -34,7 +35,7 @@ title(['Shape Filter, Impulse Response'])
 xlabel('Time index');
 ylabel('Normalized Amplitude');
 
-subplot(2,1,2);
+subplot(2,2,3);
 hold on;
 grid on;
 plot((-0.5:1/bins:0.5-1/bins)*sps,fftshift(20*log10(abs(fft(shape/sum(shape),bins)))));
@@ -43,10 +44,7 @@ title(['Shape Filter, Frequency Response'])
 xlabel('Frequency');
 ylabel('Normalized Log Magnitude (dB)');
 
-match = conv(shape,shape)/(shape*shape');
-
-figure(2);
-subplot(2,1,1);
+subplot(2,2,2);
 hold on;
 plot(1:length(impz(match)), match);
 grid on;
@@ -55,7 +53,7 @@ title(['Match Filter, Impulse Response'])
 xlabel('Time index');
 ylabel('Normalized Amplitude');
 
-subplot(2,1,2);
+subplot(2,2,4);
 hold on;
 plot((-0.5:1/bins:0.5-1/bins)*sps,fftshift(20*log10(abs(fft(match/sum(match),bins)))));
 grid on;
@@ -68,7 +66,7 @@ ylabel('Normalized Log Magnitude (dB)');
 % response and frequency response of the filters.
 [left,right] = band_edge_harris(sps,alpha,delay);
 
-figure(3);
+figure(2);
 subplot(3,2,1);
 hold on;
 plot(1:length(impz(real(left))), real(left), 'b');
@@ -133,8 +131,8 @@ matched_data = conv(shaped_mult_data,shape)/(shape*shape');
 domain_samples = [ 8*delay+1:1:sample_count-8*delay ];
 domain_symbols = [ 8*delay+1:sps:sample_count-8*delay ];
 
-figure(4);
-subplot(2,1,1);
+figure(3);
+subplot(1,4,1);
 hold on;
 plot(matched_data(domain_symbols),'r.');
 axis('equal');
@@ -142,7 +140,7 @@ axis([-2 2 -2 2])
 grid on;
 title(['Constellation Diagram, Decoupled Matched Data'])
 
-subplot(2,1,2);
+subplot(1,4,2:4);
 plot(0,0);
 hold on;
 for n=min(domain_samples):2*sps:max(domain_samples)
@@ -164,7 +162,7 @@ detect = right_detect - left_detect;
 
 domain_samples = [ 1:sample_count ];
 
-figure(5);
+figure(4);
 subplot(4,1,1);
 hold on;
 plot(left_detect(domain_samples),'r');
@@ -204,7 +202,8 @@ title('Windowed Frequency Response, Band Edge Filters');
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
 
-% 2e. 
+% 2e. Offset the received signal by a spinner of frequency 0.01 per sample.
+% With the decoupled loop filter repeat part d.
 shaped_data = shaped_data.*exp(2*pi*j*.01*(0:sample_count-1));
 shaped_mult_data = shaped_data.*exp(-2*pi*j*acc*(1:sample_count));
 
@@ -216,7 +215,7 @@ detect = right_detect - left_detect;
 
 domain_samples = [ 1:sample_count ];
 
-figure(6);
+figure(5);
 subplot(3,1,1);
 hold on;
 plot(left_detect(domain_samples),'r');
@@ -246,7 +245,10 @@ title('Band Edge Filters, Windowed Frequency Response');
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
 
-% 2f.
+% 2f. Close the loop of the frequency locked loop. Plot the output time series
+% of the two detectors, of the summing junction and of the phase profiles of
+% the input spinner phase accumulator and of the frequency lock loop phase
+% accumulator.
 right_reg = zeros(1,length(right));
 left_reg = zeros(1,length(left));
 acc = 0;
@@ -280,34 +282,55 @@ for n = 1:sample_count
     control(n) = acc;
 end
 
-figure(7);
+figure(6);
 subplot(4,1,1);
 hold on;
 plot(1:sample_count, left_detect(1:sample_count), 'b');
 grid on;
 axis([1 sample_count -inf inf]);
-title('Time Response of Band Edge Filters with Spin')
+title('Time Response, Left Band Edge Filter with Spin');
 
 subplot(4,1,2);
 hold on;
 plot(1:sample_count, right_detect(1:sample_count), 'r');
 grid on;
 axis([1 sample_count -inf inf]);
-title('Time Response of Band Edge Filters with Spin')
+title('Time Response, Right Band Edge Filter with Spin');
 
 subplot(4,1,3);
 hold on;
 plot(1:sample_count, detect(1:sample_count), 'b');
 grid on;
 axis([1 sample_count -inf inf]);
-title('Time Response of Band Edge Sum Filters with Spin')
+title('Time Response, Band Edge Detector Sum with Spin');
 
 subplot(4,1,4);
-hold on
-plot(1:sample_count, .01*(1:sample_count), 'b')
-plot(1:sample_count, control(1:sample_count), 'r')
+hold on;
+plot(1:sample_count, .01*(1:sample_count), 'b');
+plot(1:sample_count, control(1:sample_count), 'r');
+grid on;
 axis([1 sample_count -inf inf])
-hold off
-title('Phase Profile for input Spin and Output of FLL')
+title('DDS Control, FLL Phase Accumulator');
 
-% 2g.
+% 2g. Plot the constellations at the input and output of the matched filter for
+% the time interval beyond the loops transient response.
+matched_output = conv(shape,output)/(shape*shape');
+
+figure(7);
+subplot(1,2,1);
+hold on;
+plot(output(3001:sps:sample_count),'r.');
+grid on;
+axis('equal');
+axis([-2 2 -2 2]);
+title('FLL Output, Constellation Diagram');
+
+subplot(1,2,2);
+hold on;
+plot(matched_output(3001:sps:sample_count),'r.');
+grid on;
+axis('equal');
+axis([-2 2 -2 2]);
+title('Matched FLL Output, Constellation Diagram');
+
+
