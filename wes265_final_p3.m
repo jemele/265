@@ -17,43 +17,40 @@ f = [2.5 17.5]
 a = [1 0]
 % the sample rate, in kHz
 fs = 1280
-% the number of fft bins
-bins = 2048
+bins = 4096
 
 % Estimate the filter order using firpmord and the Harris approximation.
 % Use the the worst-case value and generate the filter.
+% We ignore the (large) w value created, and use our own empirically derived
+% value.
 [n,fo,ao,w]=firpmord(f,a,dev,fs)
 n = max(ceil((fs/(f(2)-f(1)))*(rs/22)),n)
-h = firpm(n,fo,ao,w);
+h = firpm(n,fo,ao,[1 200]);
 h = h/max(h);
-frequency_response = 20*log10(abs(fftshift(fft(h,bins))));
 
 % 3a. Show the time series and spectrum of the prototype filter. Show the
 % filter specifications on the spectrum.
 figure(1);
-subplot(3,1,1);
+subplot(3,2,1:2);
 hold on;
-plot(h);
-axis([0 length(h) -0.5 1.5]);
+plot(impz(h));
 grid on;
-title('Prototype Filter, Time Series, Real Part');
+title('Remez Filter, Impulse Response');
 xlabel('Time Index');
 ylabel('Normalized Amplitude');
 
-frequency_response = fftshift(20*log10(abs(fft(h/sum(h),bins))));
-subplot(3,1,2);
+frequency_response = 20*log10(abs(fftshift(fft(h/sum(h),bins))));
+subplot(3,2,3:4);
 hold on;
-plot(-0.5:1/bins:0.5-1/bins,frequency_response);
+plot(-0.5:1/bins:0.5-1/bins, frequency_response);
 grid on;
-axis([-0.1-fo(3)/2 0.1+fo(3)/2 -110 1]);
-title('Prototype Filter, Frequency Response');
+axis([-0.5 0.5 -150 1]);
+title('Remez Filter, Frequency Response');
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
 
 % plot the filter specifications
 line('XData',[-0.5 0.5],'YData',[-rs -rs], 'LineWidth', 1, 'Color','r')
-line('XData',[-0.5 0.5],'YData',[+rp/2 +rp/2], 'LineWidth', 1, 'Color','r')
-line('XData',[-0.5 0.5],'YData',[-rp/2 -rp/2], 'LineWidth', 1, 'Color','r')
 line('XData',[-2*f(1)/fs -2*f(1)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
 line('XData',[+2*f(1)/fs +2*f(1)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
 line('XData',[-2*f(2)/fs -2*f(2)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
@@ -63,17 +60,13 @@ subplot(3,2,5);
 hold on;
 plot((-0.5:1/bins:0.5-1/bins), frequency_response);
 grid on;
-axis([-3*fo(2)/2 3*fo(2)/2 -rp/2 rp/2]);
+%axis([-3 3 -.25 .15]);
+axis([-2*fo(2)/3 2*fo(2)/3 -rp/2 rp/2]);
 title('Zoom to Passband Ripple');
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
-line('XData',[-0.5 0.5],'YData',[-rs -rs], 'LineWidth', 1, 'Color','r')
 line('XData',[-0.5 0.5],'YData',[+rp/2 +rp/2], 'LineWidth', 1, 'Color','r')
 line('XData',[-0.5 0.5],'YData',[-rp/2 -rp/2], 'LineWidth', 1, 'Color','r')
-line('XData',[-2*f(1)/fs -2*f(1)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
-line('XData',[+2*f(1)/fs +2*f(1)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
-line('XData',[-2*f(2)/fs -2*f(2)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
-line('XData',[+2*f(2)/fs +2*f(2)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
 
 subplot(3,2,6);
 hold on;
@@ -84,8 +77,6 @@ title('Zoom to Stopband Ripple');
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
 line('XData',[-0.5 0.5],'YData',[-rs -rs], 'LineWidth', 1, 'Color','r')
-line('XData',[-0.5 0.5],'YData',[+rp/2 +rp/2], 'LineWidth', 1, 'Color','r')
-line('XData',[-0.5 0.5],'YData',[-rp/2 -rp/2], 'LineWidth', 1, 'Color','r')
 line('XData',[-2*f(1)/fs -2*f(1)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
 line('XData',[+2*f(1)/fs +2*f(1)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
 line('XData',[-2*f(2)/fs -2*f(2)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
@@ -95,7 +86,7 @@ line('XData',[+2*f(2)/fs +2*f(2)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
 % by convolution with [1 0 -1]/2 phase aligned with h(n) by discarding end
 % points.
 dh = conv([1 0 -1]/2,h);
-dh = dh(2:length(dh)-1);
+dh = dh(2:end-1);
 
 figure(2);
 subplot(2,1,1);
@@ -111,7 +102,8 @@ subplot(2,1,2);
 hold on;
 plot(-0.5:1/bins:0.5-1/bins,frequency_response);
 grid on;
-title('Prototype Derivative Filter, Frequency Response');
+title('Derivative Remez Filter, Frequency Response');
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
 
+% 3c.
