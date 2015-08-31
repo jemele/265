@@ -131,13 +131,59 @@ title(['Constellation Diagram, Matched Data'])
 % detectors and of the output of the summing junction. Plot the spectrum at the
 % filter outputs.
 left_output = filter(left,1,shaped_data);
+left_detect = left_output.*conj(left_output);
 right_output = filter(right,1,shaped_data);
+right_detect = right_output.*conj(right_output);
+detect_difference = right_detect - left_detect;
 
+domain_samples = [ 1:1+400 ];
 
-% fll loop filter parameters
+figure(4);
+subplot(4,1,1);
+hold on;
+plot(left_detect(domain_samples));
+axis([min(domain_samples) max(domain_samples) min(left_detect) max(left_detect)]);
+grid on;
+title('Time Response, Left Band Edge Detector');
+xlabel('Time Index');
+ylabel('Amplitude');
+
+subplot(4,1,2);
+hold on;
+plot(right_detect(domain_samples));
+axis([min(domain_samples) max(domain_samples) min(right_detect) max(right_detect)]);
+grid on;
+title('Time Response, Right Band Edge Detector');
+xlabel('Time Index');
+ylabel('Amplitude');
+
+subplot(4,1,3);
+hold on;
+plot(detect_difference(domain_samples));
+axis([min(domain_samples) max(domain_samples) min(detect_difference) max(detect_difference)]);
+grid on;
+title('Time Response, Detector Difference');
+xlabel('Time Index');
+ylabel('Amplitude');
+
+w = kaiser(bins,10);
+w = 20*w/sum(w);
+subplot(4,1,4);
+hold on;
+plot((-0.5:1/bins:0.5-1/bins),fftshift(20*log10(abs(fft(left_output(1:bins).*w,bins)))),'r');
+plot((-0.5:1/bins:0.5-1/bins),fftshift(20*log10(abs(fft(right_output(1:bins).*w,bins)))),'b');
+grid on;
+axis([-1 1 -60 10]);
+title('Band Edge Filters, Windowed Output Spectrum');
+xlabel('Normalized Frequency');
+ylabel('Normalized Log Magnitude (dB)');
+
+% loop filter parameters
 eta = sqrt(2)/2; eta=1.0*eta;
 denom = (1+2*eta*theta_0+theta_0*theta_0);
 k_i = (4*theta_0*theta_0)/denom;
 k_p = (4*eta*theta_0)/denom;
 
+w = kaiser(bins, 10);
+w = 20*w/sum(w);
 
