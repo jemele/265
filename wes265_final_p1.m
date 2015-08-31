@@ -28,7 +28,7 @@ grid on;
 plot(-delay:1:delay, shape(1:sps:length(shape)), 'ro');
 plot(-delay:1/sps:delay, shape, 'b');
 title(['Shape Filter, Impulse Resonse'])
-xlabel('Time index');
+xlabel('Time Index');
 ylabel('Normalized Amplitude');
 
 subplot(4,1,2);
@@ -46,7 +46,7 @@ grid on;
 plot(-delay:1:delay, match(1:2*sps:length(match)), 'ro');
 plot(-delay:1/(2*sps):delay, match, 'b');
 title(['Match Filter, Impulse Resonse'])
-xlabel('Time index');
+xlabel('Time Index');
 ylabel('Normalized Amplitude');
 
 subplot(4,1,4);
@@ -125,7 +125,7 @@ for n=min(domain_samples):2*sps:max(domain_samples)
 plot(-1:1/sps:1,real(matched_data(n:n+2*sps)),'b');
 end
 grid on;
-title(['Eye Diagram, Matched Data , Real Part']);
+title(['Eye Diagram, Matched Data, Real Part']);
 ylabel('Amplitude');
 
 subplot(3,1,3);
