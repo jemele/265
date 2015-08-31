@@ -26,7 +26,6 @@ bins = 4096
 [n,fo,ao,w]=firpmord(f,a,dev,fs)
 n = max(ceil((fs/(f(2)-f(1)))*(rs/22)),n)
 h = firpm(447,fo,ao,[1 4]);
-%h = h/max(h);
 
 % 3a. Show the time series and spectrum of the prototype filter. Show the
 % filter specifications on the spectrum.
@@ -60,7 +59,7 @@ subplot(3,2,5);
 hold on;
 plot((-0.5:1/bins:0.5-1/bins), frequency_response);
 grid on;
-axis([-2*fo(2)/3 2*fo(2)/3 -rp/128 rp/128]);
+axis([-2*fo(2)/3 2*fo(2)/3 -rp/2 rp/2]);
 title('Zoom to Passband Ripple');
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
@@ -137,14 +136,171 @@ grid on;
 axis([10000 inf -inf inf]);
 title('Polyphase Filter, Impulse Response, Real and Imag');
 
-w=kaiser(length(x2),20)';
-w=20*w/sum(w);
+w = kaiser(length(x2),20)';
+w = 20*w/sum(w);
 subplot(2,1,2);
 hold on;
-plot(-0.5:1/(4*bins):0.5-1/(4*bins),20*log10(abs(fftshift(fft(x2.*w,4*bins)))))
+plot(-0.5:1/(4*bins):0.5-1/(4*bins),20*log10(abs(fftshift(fft(x2.*w,4*bins)))));
 grid on;
 title('Polyphase Filter, Windowed Frequency Response');
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
 
-% 3d.
+% 3d. Use an address accumulator initialized at 1 and use an increment of 10
+% (up 64 and down 10) to skip output filter ports to obtain a sample rate
+% increase of 1-to-6.4, from 20 to 128 kHz . Apply 200 samples of a complex
+% sinewave of unit amplitude and of input frequency 2.4 KHz. Plot the time
+% response and the spectrum of the time response and note the frequency of the
+% spectrum and the amplitude of any spectral artifacts.
+% The new sample rate is 1/RR...
+RR=20/128;
+del=64*RR;
+reg=zeros(1,7);
+accum=1;
+mm=1;                                   % output clock
+nn=1;                                   % input clock
+while nn<200
+    reg=[x(nn) reg(1:6)];               % deliver new input when accum overflows
+    while accum<65                      % compute outputs till accum overflows
+         pntr=floor(accum);             % integer part of polyphase pointer
+         y=reg*h2(pntr,:)';             % compute amplitude estimate
+         dy=reg*dh2(pntr,:)';           % compute derivative estimate
+         x3(mm)=y+dy*(accum-pntr)*1;    % compute derivative corrected output
+         mm=mm+1;                       % Increment output clock
+         accum=accum+del;               % increment accumulator
+    end
+    while accum>=65                     % detect accumulator overflow
+         accum=accum-64;                % decrement accumulator 
+         if accum>65                    % determine if need new input sample
+             nn=nn+1;                   % increment input clock
+             reg_2=[x(nn) reg(1:6)];    % deliver new input sample
+         end
+    end
+    nn=nn+1;                            % increment input clock to deliver input
+end
+
+figure(4);
+subplot(2,1,1);
+hold on;
+plot(real(x3),'r');
+plot(imag(x3),'b');
+grid on;
+axis([1000 inf -inf inf]);
+title('Polyphase Filter, Impulse Response, Real and Imag');
+xlabel('Time Index');
+ylabel('Amplitude');
+
+w = kaiser(length(x3),20)';
+w = 20*w/sum(w);
+subplot(2,1,2);
+hold on;
+plot(2*64*(-0.5:1/(4*bins):0.5-1/(4*bins)),20*log10(abs(fftshift(fft(x3.*w,4*bins)))));
+grid on;
+axis([-64 64 -180 50]);
+title('Polyphase Filter, Windowed Frequency Response');
+
+% 3e. Use the address accumulator initialized at 1 and use an increment of
+% 58.1818 (up 64 and down 58.1818) with integer address to use nearest neighbor
+% skipping of output filter ports to obtain a sample rate increase of
+% 1-to-64/58.1818) or 20*63/58.1818 = 22 kHz, a 10% increase in sample rate.
+% Apply 200 samples of a complex sinewave of unit amplitude and of input
+% frequency 2.4 KHz. Plot the time response and the spectrum of the time
+% response and note the frequency of the spectrum and the amplitude of any
+% spectral artifacts.
+RR=20/22;
+del=64*RR;
+reg=zeros(1,7);
+accum=1;
+mm=1;                                   % output clock
+nn=1;                                   % input clock
+while nn<200
+    reg=[x(nn) reg(1:6)];               % deliver new input when accum overflows
+    while accum<65                      % compute outputs till accum overflows
+         pntr=floor(accum);             % integer part of polyphase pointer
+         y=reg*h2(pntr,:)';             % compute amplitude estimate
+         dy=reg*dh2(pntr,:)';           % compute derivative estimate
+         x4(mm)=y+dy*(accum-pntr)*1;    % compute derivative corrected output
+         mm=mm+1;                       % Increment output clock
+         accum=accum+del;               % increment accumulator
+    end
+    while accum>=65                     % detect accumulator overflow
+         accum=accum-64;                % decrement accumulator 
+         if accum>65                    % determine if need new input sample
+             nn=nn+1;                   % increment input clock
+             reg_2=[x(nn) reg(1:6)];    % deliver new input sample
+         end
+    end
+    nn=nn+1;                            % increment input clock to deliver input
+end
+
+figure(5);
+subplot(2,1,1);
+hold on;
+plot(real(x4),'r');
+plot(imag(x4),'b');
+grid on;
+axis([100 inf -inf inf]);
+title('Polyphase Filter, Impulse Response, Real and Imag');
+xlabel('Time Index');
+ylabel('Amplitude');
+
+w = kaiser(length(x4),20)';
+w = 20*w/sum(w);
+subplot(2,1,2);
+hold on;
+plot(2*64*(-0.5:1/(4*bins):0.5-1/(4*bins)),20*log10(abs(fftshift(fft(x4.*w,4*bins)))));
+grid on;
+axis([-64 64 -180 50]);
+title('Polyphase Filter, Windowed Frequency Response');
+
+% 3f. Repeat part e except do not use the derivative filter (multiply  by 0).
+% Plot the time response and the spectrum of the time response and note and
+% comment on the frequency of the spectrum and the amplitude of any spectral
+% artifacts.
+RR=20/22;
+del=64*RR;
+reg=zeros(1,7);
+accum=1;
+mm=1;                                   % output clock
+nn=1;                                   % input clock
+while nn<200
+    reg=[x(nn) reg(1:6)];               % deliver new input when accum overflows
+    while accum<65                      % compute outputs till accum overflows
+         pntr=floor(accum);             % integer part of polyphase pointer
+         y=reg*h2(pntr,:)';             % compute amplitude estimate
+         x5(mm)=y;                      % omit derivative corrected output
+         mm=mm+1;                       % Increment output clock
+         accum=accum+del;               % increment accumulator
+    end
+    while accum>=65                     % detect accumulator overflow
+         accum=accum-64;                % decrement accumulator 
+         if accum>65                    % determine if need new input sample
+             nn=nn+1;                   % increment input clock
+             reg_2=[x(nn) reg(1:6)];    % deliver new input sample
+         end
+    end
+    nn=nn+1;                            % increment input clock to deliver input
+end
+
+figure(6);
+subplot(2,1,1);
+hold on;
+plot(real(x5),'r');
+plot(imag(x5),'b');
+grid on;
+axis([100 inf -inf inf]);
+title('Polyphase Filter without Derivative Corrected Output, Impulse Response, Real and Imag');
+xlabel('Time Index');
+ylabel('Amplitude');
+
+w = kaiser(length(x5),20)';
+w = 20*w/sum(w);
+subplot(2,1,2);
+hold on;
+plot(2*64*(-0.5:1/(4*bins):0.5-1/(4*bins)),20*log10(abs(fftshift(fft(x5.*w,4*bins)))));
+grid on;
+axis([-64 64 -180 50]);
+title('Polyphase Filter without Derivative Corrected Output, Windowed Frequency Response');
+ylabel('Log Magnitude (dB)');
+
+
