@@ -73,7 +73,7 @@ domain_symbols = [ 4*delay+1:sps:4*delay+1+400 ];
 % 1b. Show 400 samples of the time response (real part), the eye diagram, and
 % the constellation formed by the shape filter.
 figure(12);
-subplot(3,1,1);
+subplot(2,3,1:3);
 hold on;
 plot(domain_samples, real(shaped_data(domain_samples)));
 plot(domain_symbols, real(shaped_data(domain_symbols)),'ro');
@@ -83,7 +83,7 @@ title(['Shaped Data, Real part']);
 xlabel('Sample');
 ylabel('Amplitude');
 
-subplot(3,1,2);
+subplot(2,3,4:5);
 plot(0,0);
 hold on;
 for n=min(domain_samples):2*sps:max(domain_samples)
@@ -94,7 +94,7 @@ grid on;
 title(['Eye Diagram, Shaped Data , Real Part']);
 ylabel('Amplitude');
 
-subplot(3,1,3);
+subplot(2,3,6);
 plot(shaped_data(81:sps:4000),'r.');
 grid on;
 axis('equal');
@@ -107,7 +107,7 @@ domain_symbols = [ 8*delay+1:sps:8*delay+1+400 ];
 % 1c. Show 400 samples of the time response (real part) the eye diagram and the
 % constellation of the signal formed at the matched filter output.
 figure(13);
-subplot(3,1,1);
+subplot(2,3,1:3);
 hold on;
 plot(domain_samples, real(matched_data(domain_samples)));
 plot(domain_symbols, real(matched_data(domain_symbols)),'ro');
@@ -117,7 +117,7 @@ title(['Matched Data, Real part']);
 xlabel('Sample');
 ylabel('Amplitude');
 
-subplot(3,1,2);
+subplot(2,3,4:5);
 plot(0,0);
 hold on;
 for n=min(domain_samples):2*sps:max(domain_samples)
@@ -127,7 +127,7 @@ grid on;
 title(['Eye Diagram, Matched Data, Real Part']);
 ylabel('Amplitude');
 
-subplot(3,1,3);
+subplot(2,3,6);
 hold on;
 plot(matched_data(domain_symbols),'r.');
 axis('equal');
@@ -588,6 +588,8 @@ plot(1:sample_count, control(1:sample_count), 'r');
 grid on;
 axis([1 sample_count -inf inf])
 title('DDS Control, FLL Phase Accumulator');
+xlabel('Time Index');
+ylabel('Frequency (Hz)');
 
 % 2g. Plot the constellations at the input and output of the matched filter for
 % the time interval beyond the loops transient response.
@@ -633,6 +635,7 @@ N = 447
 ao = {'myfrf', [1 1 0 0]}
 w = [1 2]
 h = firpm(N,fo,ao,w);
+h = h*64;
 
 % 3a. Show the time series and spectrum of the prototype filter. Show the
 % filter specifications on the spectrum.
@@ -702,7 +705,7 @@ ylabel('Amplitude');
 
 subplot(2,1,2);
 hold on;
-plot(-0.5:1/bins:0.5-1/bins,fftshift(20*log10(abs(fft(dh*64,bins)))));
+plot(-0.5:1/bins:0.5-1/bins,fftshift(20*log10(abs(fft(dh,bins)))));
 grid on;
 title('Derivative Remez Filter, Frequency Response');
 xlabel('Normalized Frequency');
@@ -803,7 +806,7 @@ plot(2*64*(-0.5:1/(4*bins):0.5-1/(4*bins)),20*log10(abs(fftshift(fft(x3.*w,4*bin
 grid on;
 axis([-64 64 -180 50]);
 title('Polyphase Filter, Windowed Frequency Response');
-xlabel('Frequency');
+xlabel('Frequency (kHz)');
 ylabel('Log Magnitude (dB)');
 
 % 3e. Use the address accumulator initialized at 1 and use an increment of
@@ -859,8 +862,8 @@ plot(2*64*(-0.5:1/(4*bins):0.5-1/(4*bins)),20*log10(abs(fftshift(fft(x4.*w,4*bin
 grid on;
 axis([-64 64 -180 50]);
 title('Polyphase Filter, Windowed Frequency Response');
-xlabel('Frequency');
-ylabel('Magnitude Response (dB)');
+xlabel('Frequency (kHz)');
+ylabel('Log Magnitude (dB)');
 
 % 3f. Repeat part e except do not use the derivative filter (multiply  by 0).
 % Plot the time response and the spectrum of the time response and note and
@@ -910,7 +913,7 @@ plot(2*64*(-0.5:1/(4*bins):0.5-1/(4*bins)),20*log10(abs(fftshift(fft(x5.*w,4*bin
 grid on;
 axis([-64 64 -180 50]);
 title('Polyphase Filter without Derivative Corrected Output, Windowed Frequency Response');
-xlabel('Frequency');
+xlabel('Frequency (kHz)');
 ylabel('Log Magnitude (dB)');
 
 
