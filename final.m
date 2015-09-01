@@ -35,7 +35,7 @@ hold on;
 grid on;
 plot((-0.5:1/bins:0.5-1/bins)*sps,shape_frequency_response);
 axis([-2 2 -150 0.1]);
-title(['Shape Filter, Frequency Resonse'])
+title(['Shape Filter, Frequency Response'])
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
 
@@ -44,7 +44,7 @@ hold on;
 grid on;
 plot(-delay:1:delay, match(1:2*sps:length(match)), 'ro');
 plot(-delay:1/(2*sps):delay, match, 'b');
-title(['Match Filter, Impulse Resonse'])
+title(['Match Filter, Impulse Response'])
 xlabel('Time Index');
 ylabel('Amplitude');
 
@@ -53,7 +53,7 @@ hold on;
 grid on;
 plot((-0.5:1/bins:0.5-1/bins)*sps,match_frequency_response);
 axis([-2 2 -150 0.1]);
-title(['Match Filter, Frequency Resonse'])
+title(['Match Filter, Frequency Response'])
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
 
@@ -145,7 +145,7 @@ received_data = conv(shaped_data,channel);
 matched_data = conv(received_data,shape)/(shape*shape');
 
 figure(14);
-subplot(3,1,1);
+subplot(2,3,1:3);
 hold on;
 plot(domain_samples, real(received_data(domain_samples)));
 plot(domain_symbols, real(received_data(domain_symbols)),'ro');
@@ -155,7 +155,7 @@ title(['Channel Output, Real part']);
 xlabel('Sample');
 ylabel('Amplitude');
 
-subplot(3,1,2);
+subplot(2,3,4:5);
 plot(0,0);
 hold on;
 for n=min(domain_samples):2*sps:max(domain_samples)
@@ -166,7 +166,7 @@ grid on;
 title(['Eye Diagram, Channel Output, Real Part']);
 ylabel('Amplitude');
 
-subplot(3,1,3);
+subplot(2,3,6);
 hold on;
 plot(received_data(domain_symbols),'r.');
 axis('square');
@@ -329,7 +329,7 @@ hold on;
 plot((-0.5:1/bins:0.5-1/bins)*sps,fftshift(20*log10(abs(fft(match/sum(match),bins)))));
 grid on;
 axis([-inf inf -150 10]);
-title(['Match Filter, Frequency Resonse'])
+title(['Match Filter, Frequency Response'])
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
 
