@@ -1,6 +1,5 @@
 % Joshua Emele <jemele@acm.org>
 % WES265, Final, Problem 1
-
 % clean up environment before starting
 clear all;
 close all;
@@ -29,7 +28,7 @@ plot(-delay:1:delay, shape(1:sps:length(shape)), 'ro');
 plot(-delay:1/sps:delay, shape, 'b');
 title(['Shape Filter, Impulse Response'])
 xlabel('Time Index');
-ylabel('Normalized Amplitude');
+ylabel('Amplitude');
 
 subplot(4,1,2);
 hold on;
@@ -37,8 +36,8 @@ grid on;
 plot((-0.5:1/bins:0.5-1/bins)*sps,shape_frequency_response);
 axis([-2 2 -150 0.1]);
 title(['Shape Filter, Frequency Resonse'])
-xlabel('Frequency');
-ylabel('Normalized Log Magnitude (dB)');
+xlabel('Normalized Frequency');
+ylabel('Log Magnitude (dB)');
 
 subplot(4,1,3);
 hold on;
@@ -47,7 +46,7 @@ plot(-delay:1:delay, match(1:2*sps:length(match)), 'ro');
 plot(-delay:1/(2*sps):delay, match, 'b');
 title(['Match Filter, Impulse Resonse'])
 xlabel('Time Index');
-ylabel('Normalized Amplitude');
+ylabel('Amplitude');
 
 subplot(4,1,4);
 hold on;
@@ -56,7 +55,7 @@ plot((-0.5:1/bins:0.5-1/bins)*sps,match_frequency_response);
 axis([-2 2 -150 0.1]);
 title(['Match Filter, Frequency Resonse'])
 xlabel('Normalized Frequency');
-ylabel('Normalized Log Magnitude (dB)');
+ylabel('Log Magnitude (dB)');
 
 % generate symbols
 symbols = [ -1-j -1+j 1-j 1+j ];
@@ -181,7 +180,7 @@ domain_symbols = [ 8*delay+1:sps:8*delay+1+400 ];
 % 1e. Show 400 samples of the time response (real part) the eye diagram and the
 % constellation of the signal formed at the matched filter output.
 figure(15);
-subplot(3,1,1);
+subplot(2,3,1:3);
 hold on;
 plot(domain_samples, real(matched_data(domain_samples)));
 plot(domain_symbols, real(matched_data(domain_symbols)),'ro');
@@ -191,7 +190,7 @@ title(['Matched Output, Real part']);
 xlabel('Sample');
 ylabel('Amplitude');
 
-subplot(3,1,2);
+subplot(2,3,4:5);
 plot(0,0);
 hold on;
 for n=min(domain_samples):2*sps:max(domain_samples)
@@ -202,7 +201,7 @@ grid on;
 title(['Eye Diagram, Matched Output, Real Part']);
 ylabel('Amplitude');
 
-subplot(3,1,3);
+subplot(2,3,6);
 hold on;
 plot(matched_data(domain_symbols),'r.');
 axis('square');
@@ -241,7 +240,7 @@ domain_symbols = [400+1:sps:400+1+400];
 figure(17);
 [output, err] = equalizer(sps,matched_data,taps,33);
 
-subplot(3,1,1);
+subplot(2,3,1:3);
 hold on;
 plot(domain_samples, real(output(domain_samples)));
 plot(domain_symbols, real(output(domain_symbols)),'ro');
@@ -251,7 +250,7 @@ title(['Equalizer Output, Real part']);
 xlabel('Sample');
 ylabel('Amplitude');
 
-subplot(3,1,2);
+subplot(2,3,4:5);
 plot(0,0);
 hold on;
 for n=min(domain_samples):2*sps:max(domain_samples)
@@ -262,7 +261,7 @@ grid on;
 title(['Eye Diagram, Equalizer Output, Real Part']);
 ylabel('Amplitude');
 
-subplot(3,1,3);
+subplot(2,3,6);
 hold on;
 plot(output(domain_symbols),'r.');
 axis('square');
@@ -270,13 +269,12 @@ axis([-1.5 1.5 -1.5 1.5]);
 grid on;
 title(['Constellation Diagram']);
 
-
 % Joshua Emele <jemele@acm.org>
 % WES265, Final, Problem 2
- 
 % clean up environment before starting
+%pause;
 clear all;
-close all;
+%close all;
 
 % design parameters
 alpha = 0.5
@@ -306,7 +304,7 @@ grid on;
 axis([1 length(shape) -inf inf]);
 title(['Shape Filter, Impulse Response'])
 xlabel('Time index');
-ylabel('Normalized Amplitude');
+ylabel('Amplitude');
 
 subplot(2,2,3);
 hold on;
@@ -314,8 +312,8 @@ grid on;
 plot((-0.5:1/bins:0.5-1/bins)*sps,fftshift(20*log10(abs(fft(shape/sum(shape),bins)))));
 axis([-inf inf -100 10]);
 title(['Shape Filter, Frequency Response'])
-xlabel('Frequency');
-ylabel('Normalized Log Magnitude (dB)');
+xlabel('Normalized Frequency');
+ylabel('Log Magnitude (dB)');
 
 subplot(2,2,2);
 hold on;
@@ -324,7 +322,7 @@ grid on;
 axis([1 length(match) -inf inf]);
 title(['Match Filter, Impulse Response'])
 xlabel('Time index');
-ylabel('Normalized Amplitude');
+ylabel('Amplitude');
 
 subplot(2,2,4);
 hold on;
@@ -333,7 +331,7 @@ grid on;
 axis([-inf inf -150 10]);
 title(['Match Filter, Frequency Resonse'])
 xlabel('Normalized Frequency');
-ylabel('Normalized Log Magnitude (dB)');
+ylabel('Log Magnitude (dB)');
 
 % 2b. Form the pair of band edge filters and show on a single page the impulse
 % response and frequency response of the filters.
@@ -384,7 +382,7 @@ grid on;
 axis([-inf inf -100 10]);
 title(['Band Edge Filters, Frequency Response'])
 xlabel('Normalized Frequency');
-ylabel('Normalized Log Magnitude (dB)');
+ylabel('Log Magnitude (dB)');
 
 % generate symbols
 symbols = [ -1-j -1+j 1-j 1+j ];
@@ -561,21 +559,27 @@ hold on;
 plot(1:sample_count, left_detect(1:sample_count), 'b');
 grid on;
 axis([1 sample_count -inf inf]);
-title('Time Response, Left Band Edge Filter with Spin');
+title('Left Band Edge Filter with Spin, Impulse Response');
+xlabel('Time Index');
+ylabel('Amplitude');
 
 subplot(4,1,2);
 hold on;
 plot(1:sample_count, right_detect(1:sample_count), 'r');
 grid on;
 axis([1 sample_count -inf inf]);
-title('Time Response, Right Band Edge Filter with Spin');
+title('Right Band Edge Filter with Spin, Impulse Response');
+xlabel('Time Index');
+ylabel('Amplitude');
 
 subplot(4,1,3);
 hold on;
 plot(1:sample_count, detect(1:sample_count), 'b');
 grid on;
 axis([1 sample_count -inf inf]);
-title('Time Response, Band Edge Detector Sum with Spin');
+title('Band Edge Detector Sum with Spin, Impulse Response');
+xlabel('Time Index');
+ylabel('Amplitude');
 
 subplot(4,1,4);
 hold on;
@@ -609,30 +613,26 @@ title('Matched FLL Output, Constellation Diagram');
 % Joshua Emele <jemele@acm.org>
 % WES265, Final, Problem 3
 % clean up environment before starting
+%pause;
 clear all;
-close all;
+%close all;
 
 % filter design parameters
 % passband peak-to-peak ripple (dB)
 rp = .1
 % stopband attenuation (dB)
 rs = 100
-% convert from dB to volt
-dev = [(10^(rp/20)-1)/(10^(rp/20)+1)  10^(-rs/20)];
-% the transition and stop band, in kHz
-f = [2.5 17.5]
-a = [1 0]
-% the sample rate, in kHz
-fs = 1280
+fo = [0 2.5 17.5 640]/640
 bins = 4096
 
-% Estimate the filter order using firpmord and the Harris approximation.
-% Use the the worst-case value and generate the filter.
-% We ignore the (large) w value created, and use our own empirically derived
-% value.
-[n,fo,ao,w]=firpmord(f,a,dev,fs)
-n = max(ceil((fs/(f(2)-f(1)))*(rs/22)),n)
-h = firpm(447,fo,ao,[1 4]);
+% The Harris approximation yields N=389, but since we know we are going to
+% upsample by 64, we choose the next largest filter with order divisible by 64. 
+% The w value was empirically determined and appears to be the smallest
+% admissisble value.
+N = 447
+ao = {'myfrf', [1 1 0 0]}
+w = [1 2]
+h = firpm(N,fo,ao,w);
 
 % 3a. Show the time series and spectrum of the prototype filter. Show the
 % filter specifications on the spectrum.
@@ -643,7 +643,7 @@ plot(impz(h));
 grid on;
 title('Remez Filter, Impulse Response');
 xlabel('Time Index');
-ylabel('Normalized Amplitude');
+ylabel('Amplitude');
 
 frequency_response = 20*log10(abs(fftshift(fft(h/sum(h),bins))));
 subplot(3,2,3:4);
@@ -656,11 +656,11 @@ xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
 
 % plot the filter specifications
-line('XData',[-0.5 0.5],'YData',[-rs -rs], 'LineWidth', 1, 'Color','r')
-line('XData',[-2*f(1)/fs -2*f(1)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
-line('XData',[+2*f(1)/fs +2*f(1)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
-line('XData',[-2*f(2)/fs -2*f(2)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
-line('XData',[+2*f(2)/fs +2*f(2)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
+line('XData',[-0.5 0.5],'YData',[-rs -rs], 'Color','r')
+line('XData',[-fo(2) -fo(2)],'YData',ylim, 'Color','r')
+line('XData',[+fo(2) +fo(2)],'YData',ylim, 'Color','r')
+line('XData',[-fo(3) -fo(3)],'YData',ylim, 'Color','r')
+line('XData',[+fo(3) +fo(3)],'YData',ylim, 'Color','r')
 
 subplot(3,2,5);
 hold on;
@@ -671,10 +671,6 @@ title('Zoom to Passband Ripple');
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
 
-% These aren't relevent, since there's almost no passband ripple.
-line('XData',[-0.5 0.5],'YData',[+rp/2 +rp/2], 'LineWidth', 1, 'Color','r')
-line('XData',[-0.5 0.5],'YData',[-rp/2 -rp/2], 'LineWidth', 1, 'Color','r')
-
 subplot(3,2,6);
 hold on;
 plot((-0.5:1/bins:0.5-1/bins), frequency_response);
@@ -683,11 +679,11 @@ axis([fo(3)/2-0.01 fo(3)/2+0.05 -rs-5 -rs+5]);
 title('Zoom to Stopband Ripple');
 xlabel('Normalized Frequency');
 ylabel('Log Magnitude (dB)');
-line('XData',[-0.5 0.5],'YData',[-rs -rs], 'LineWidth', 1, 'Color','r')
-line('XData',[-2*f(1)/fs -2*f(1)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
-line('XData',[+2*f(1)/fs +2*f(1)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
-line('XData',[-2*f(2)/fs -2*f(2)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
-line('XData',[+2*f(2)/fs +2*f(2)/fs],'YData',ylim, 'LineWidth', 1, 'Color','r')
+line('XData',[-0.5 0.5],'YData',[-rs -rs], 'Color','r')
+line('XData',[-fo(2) -fo(2)],'YData',ylim, 'Color','r')
+line('XData',[+fo(2) +fo(2)],'YData',ylim, 'Color','r')
+line('XData',[-fo(3) -fo(3)],'YData',ylim, 'Color','r')
+line('XData',[+fo(3) +fo(3)],'YData',ylim, 'Color','r')
 
 % 3b. Show the time series and spectrum pf the derivative filter dh(n) formed
 % by convolution with [1 0 -1]/2 phase aligned with h(n) by discarding end
@@ -742,6 +738,8 @@ plot(imag(x2), 'b');
 grid on;
 axis([10000 inf -inf inf]);
 title('Polyphase Filter, Impulse Response, Real and Imag');
+xlabel('Time Index');
+ylabel('Amplitude');
 
 w = kaiser(length(x2),20)';
 w = 20*w/sum(w);
@@ -805,6 +803,8 @@ plot(2*64*(-0.5:1/(4*bins):0.5-1/(4*bins)),20*log10(abs(fftshift(fft(x3.*w,4*bin
 grid on;
 axis([-64 64 -180 50]);
 title('Polyphase Filter, Windowed Frequency Response');
+xlabel('Frequency');
+ylabel('Log Magnitude (dB)');
 
 % 3e. Use the address accumulator initialized at 1 and use an increment of
 % 58.1818 (up 64 and down 58.1818) with integer address to use nearest neighbor
@@ -859,6 +859,8 @@ plot(2*64*(-0.5:1/(4*bins):0.5-1/(4*bins)),20*log10(abs(fftshift(fft(x4.*w,4*bin
 grid on;
 axis([-64 64 -180 50]);
 title('Polyphase Filter, Windowed Frequency Response');
+xlabel('Frequency');
+ylabel('Magnitude Response (dB)');
 
 % 3f. Repeat part e except do not use the derivative filter (multiply  by 0).
 % Plot the time response and the spectrum of the time response and note and
@@ -908,6 +910,7 @@ plot(2*64*(-0.5:1/(4*bins):0.5-1/(4*bins)),20*log10(abs(fftshift(fft(x5.*w,4*bin
 grid on;
 axis([-64 64 -180 50]);
 title('Polyphase Filter without Derivative Corrected Output, Windowed Frequency Response');
+xlabel('Frequency');
 ylabel('Log Magnitude (dB)');
 
 
